@@ -167,3 +167,41 @@ def get_product_data(product_url: str,
         "available_quantity": available_quantity,
         "scraping_date": date.today().strftime("%d/%m/%Y")
     }
+
+def scrape_search_results(search_url: str,
+                          headers: dict = {},
+                          timeout: int = 10,
+                          max_retries: int = 1) -> list:
+    """Scrape the search results from the search URL.
+
+    :param search_url: The URL of the search page.
+    :type search_url: str
+    :param headers: The headers to use in the request.
+    :type headers: dict
+    :param timeout: The timeout in seconds.
+    :type timeout: int
+    :param max_retries: The maximum number of retries.
+    :type max_retries: int
+    :return: A list of the data of the products.
+    :rtype: list
+    """
+    product_urls = get_product_urls(search_url,
+                                    headers=headers,
+                                    timeout=timeout,
+                                    max_retries=max_retries)
+
+    print("Getting the data of the products...")
+    product_data = []
+    for count, product_url in enumerate(product_urls):
+        print(f"\rScraping product {(count + 1):4}/{len(product_urls)}", end="")
+        product_data.append(
+            get_product_data(
+                product_url,
+                headers=headers,
+                timeout=timeout,
+                max_retries=max_retries
+            )
+        )
+    print(f"\nDone! Obtained data of {len(product_data)} products.")
+
+    return product_data
